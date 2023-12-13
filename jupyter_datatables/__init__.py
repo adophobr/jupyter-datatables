@@ -238,7 +238,7 @@ def _repr_datatable_(self, options: dict = None, classes: list = None):
         })
 
     # column types
-    options.update({'columnDefs': _get_columns_defs(self, options)})
+    options['columnDefs'] = _get_columns_defs(self, options)
 
     # pop buttons, we need to use them separately
     buttons = options.pop("buttons", [])
@@ -262,11 +262,11 @@ def _repr_datatable_(self, options: dict = None, classes: list = None):
     adjusted = False
 
     if config.defaults.limit is not None:
-        n = len(self)
-
         # compute the sample size, it will be used for the data preview
         # to speed up computation
         if len(self) > config.defaults.limit:
+            n = len(self)
+
             sample_size = getattr(config.defaults, 'sample_size', None) or min([
                 n, _calculate_sample_size(n)
             ])
@@ -298,7 +298,7 @@ def _repr_datatable_(self, options: dict = None, classes: list = None):
         sample_size = len(df)
 
     sort = config.defaults.sort
-    if sort == True or sort == 'index':
+    if sort in [True, 'index']:
         df.sort_index(inplace=True)
     elif sort:
         df.sort_values(inplace=True)
@@ -410,7 +410,7 @@ def _smart_ceil(x: typing.Union[int, float], order: int = None) -> int:
 
     The 'nearest' is chosen based on the order of the given number
     """
-    order = int(order) if order else len(str(math.ceil(x)))
+    order = order if order else len(str(math.ceil(x)))
     if order <= 0:
         raise ValueError("`order` must be integer >= 0")
     mod = math.pow(10, min([order, 3]))
